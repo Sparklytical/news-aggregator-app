@@ -1,9 +1,9 @@
 :root {
   --text-size: 1.4rem;
   --border-color: #888;
-  --bg-col-1: rgba(229, 249, 250, 0.7);
-  --bg-col-2: rgba(200, 230, 231, 0.6);
-  --card-bg: #e9e6e6;
+  --bg-col-1: rgba(247, 248, 248, 0.7);
+  --bg-col-2: rgba(177, 182, 182, 0.6);
+  --card-bg: #f8f8f8;
   --card-col: #333;
   --max-w: 80rem;
 }
@@ -34,8 +34,8 @@
   -webkit-box-orient: vertical;
 }
 
-@import 'loader';
-@import 'switcher';
+@import "loader";
+@import "switcher";
 
 *,
 *::after,
@@ -51,7 +51,7 @@ html {
 
 body {
   box-sizing: border-box;
-  font-family: 'Roboto', sans-serif;
+  font-family: "Roboto", sans-serif;
   font-size: var(--text-size);
   background-image: linear-gradient(
     to bottom right,
@@ -167,7 +167,7 @@ main {
 
   &:hover {
     box-shadow: 0px 0px 1.5rem rgba($color: #000000, $alpha: 0.2);
-    transform: scale(1.03) translateY(-1rem);
+    transform: translateY(-0.3rem);
   }
 
   &-link {
@@ -186,8 +186,12 @@ main {
     flex-direction: column;
     justify-content: center;
     margin-bottom: 1rem;
+
     img {
       width: 100%;
+      overflow: hidden;
+      border-top-left-radius: 0.5rem;
+      border-top-right-radius: 0.5rem;
     }
   }
 
@@ -203,6 +207,9 @@ main {
   &-description {
     font-size: 1.4rem;
     line-height: 2.2rem;
+    padding: 0 1.4rem;
+    margin-bottom: 0.5rem;
+
     font-weight: 400;
     margin-bottom: 1rem;
     @include heightTruncate(2);
@@ -211,6 +218,7 @@ main {
 
   &__footer {
     display: flex;
+    padding: 0 1.4rem;
     justify-content: flex-end;
     font-weight: 500;
     font-size: 1.5rem;
