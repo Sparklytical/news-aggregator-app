@@ -1,151 +1,186 @@
-require("../styles/index.css");
+import { getData } from './request';
+import '../styles/index.scss';
 
-// API Key
-const apikey = "a601c1b2a5df46d883bdd85f8439d1aa";
+const apiKey = process.env.APIKEY;
+const headlinesURL = `https://newsapi.org/v2/top-headlines?country=in&apiKey=${apiKey}`;
+const everythingURL = `https://newsapi.org/v2/everything?apiKey=${apiKey}`;
 
-function getNews() {
-  // alert('hello');
+// elements
+const loader = document.querySelector('#loading');
+const newsContainer = document.querySelector('#news-articles');
+const more = document.querySelector('#show-more');
+const searchBox = document.querySelector('#search');
+const notFound = document.querySelector('.not-found');
+const error = document.querySelector('.error');
+const clearSearch = document.querySelector('#clear-search');
+const switcher = document.getElementById('mode-switch');
 
-  const url =
-    "https://newsapi.org/v2/top-headlines?country=in&apiKey=" + apikey;
-  fetch(url)
-    .then(res => res.json())
-    .then(data => {
-      // console.log(data.articles);
-      const length = data.articles.length;
-      var output = "";
+// data
+let articles = [];
+let totalResults = 0;
+let state = 'h';
+const headlinesFilter = {
+  page: 1,
+  pageSize: 20,
+  q: ''
+};
+let theme;
 
-      // console.log(length);
+init();
 
-      for (var i = 0; i < length; i++) {
-        var obj = data.articles;
-        // console.log(obj[i].title);
+async function getArticles(
+  isSearch,
+  page = headlinesFilter.page,
+  pageSize = headlinesFilter.pageSize,
+  q = headlinesFilter.q
+) {
+  try {
+    const url = isSearch
+      ? `${everythingURL}&q=${q}&page=${page}&pageSize=${pageSize}`
+      : `${headlinesURL}&page=${page}&pageSize=${pageSize}`;
+    state = isSearch ? 'e' : 'h';
+    const data = await getData(url);
 
-        var titles = obj[i].title;
-        var authors = obj[i].author;
-        var descriptions = obj[i].description;
-        var urls = obj[i].url;
-        var image = obj[i].urlToImage;
-
-        // output += 'Title: ' + titles + '<br>'
-        //     + 'Author: ' + authors + '<br>'
-        //     + 'Description: ' + descriptions + '<br>'
-        //     + 'Reference: ' + urls + '<br>'
-        //     + 'Image: ' + image + '<hr>';
-
-        //patch002 none != none -> style="transform: matrix()" , :hover manipulates parameters
-
-        output +=
-          '<li class="article">' +
-          '<div class="card p-1" style="width: 15rem;display:none"><img src="' +
-          image +
-          '" class="article-img" alt="..."></div> ' + //patch005
-          '<div class="card p-1" style="width: 15rem;"><img src="' +
-          image +
-          '" class="card-img-top article-img" alt="..."> ' +
-          '<div class="card-body">' +
-          '<h2 class="article-title">' +
-          titles.substring(0, 70) +
-          "</h2>" +
-          '<p class="article-description">' +
-          descriptions.substring(0, 100) +
-          "</p>" +
-          '<span class="article-author">' +
-          authors +
-          "</span><br>" +
-          '<a href="' +
-          urls +
-          '" class="article-link">know more</a>' +
-          "</div></div></li> ";
-
-        document.getElementById("news-articles").innerHTML = output;
-      }
-    });
-}
-
-getNews();
-
-// document.getElementById('search').addEventListener('onkeypress',searchNews())
-
-function searchNews() {
-  var query = document.getElementById("search").value;
-
-  // alert('search' + '    ' + query);
-
-  //
-
-  // const url = 'http://newsapi.org/v2/everything?q='+'apple'+'&apiKey=6f1cacbf2bae46faa35d5a9db3005c04';
-
-  const url =
-    "http://newsapi.org/v2/everything?q=" + query + "&apiKey=" + apikey;
-
-  fetch(url)
-    .then(res => res.json())
-    .then(data => {
-      // console.log(data.articles);
-      const length = data.articles.length;
-      const results = data.totalResults;
-      var output = "";
-
-      // console.log(length);
-
-      // alert('totalresults: ' + data.totalResults);
-
-      if (results != 0) {
-        for (var i = 0; i < length; i++) {
-          var obj = data.articles;
-          // console.log(obj[i].title);
-
-          var titles = obj[i].title;
-          var authors = obj[i].author;
-          var descriptions = obj[i].description;
-          var urls = obj[i].url;
-          var image = obj[i].urlToImage;
-
-          output +=
-            '<li class="article">' +
-            '<div class="card p-1" style="width: 15rem;display:none"><img src="' +
-            image +
-            '" class="article-img" alt="..."></div> ' + //patch005
-            '<div class="card p-2" style="width: 17rem;"><img src="' +
-            image +
-            '" class="card-img-top article-img" alt="..."> ' +
-            '<div class="card-body">' +
-            '<h2 class="article-title">' +
-            titles.substring(0, 70) +
-            "</h2>" +
-            '<p class="article-description">' +
-            descriptions.substring(0, 100) +
-            "</p>" +
-            '<span class="article-author">' +
-            authors +
-            "</span><br>" +
-            '<a href="' +
-            urls +
-            '" class="article-link">know more</a>';
-          ("</div></div></li> ");
-
-          document.getElementById("news-articles").innerHTML = output;
-        }
-      } else {
-        document.getElementById("news-articles").innerHTML = "";
-
-        document.getElementById("notfound").innerHTML =
-          "No article was found based on the search.";
-      }
-    });
-}
-
-document.getElementById("search").addEventListener(
-  "keypress",
-  function(e) {
-    if (e.keyCode === 13) {
-      var query = document.getElementById("search").value;
-
-      query == "" ? getNews() : searchNews();
-
-      // searchNews();
+    if (data.status !== 'ok') {
+      handleError(error);
+      return;
     }
-  },
-  false
-);
+
+    if (data.articles.length === 0) {
+      notFound.style.display = 'block';
+      newsContainer.style.display = 'none';
+      articles = [];
+      return;
+    }
+
+    // show data
+    totalResults = data.totalResults;
+    articles = [...articles, ...data.articles];
+
+    const list = renderNews(articles);
+
+    newsContainer.innerHTML = list;
+    newsContainer.style.display = 'grid';
+    notFound.style.display = 'none';
+  } catch (error) {
+    handleError(error);
+  } finally {
+    loader.style.display = 'none';
+    if (totalResults !== articles.length && articles.length > 0) {
+      more.style.display = 'block';
+    } else {
+      more.style.display = 'none';
+    }
+  }
+}
+
+function init() {
+  themeInit();
+  loader.style.display = 'flex';
+  error.style.display = 'none';
+  clearSearch.style.display = 'none';
+  articles = [];
+  getArticles(false);
+}
+
+//reset app
+function clear() {
+  searchBox.value = null;
+  clearSearch.style.display = 'none';
+  init();
+}
+
+function handleError(msg = null) {
+  error.style.display = 'block';
+}
+
+//articles list
+function renderNews(news) {
+  let html = '';
+  news.forEach(n => {
+    const author = n.author ? n.author : n.source.name;
+    const image = n.urlToImage
+      ? n.urlToImage
+      : 'https://user-images.githubusercontent.com/101482/29592647-40da86ca-875a-11e7-8bc3-941700b0a323.png';
+    html += `<li class="article">
+      <a href="${n.url}" class="article-link">
+        <div class="article__head">
+          <img
+            src="${image}"
+            alt="${n.title}"
+            class="article-img"
+          />
+          <h2 class="article-title">
+            ${n.title}
+          </h2>
+        </div>
+        <p class="article-description">
+          ${n.description ? n.description : ''}
+        </p>
+        <div class="article__footer">
+          <span class="article-author">
+            - ${author}
+          </span>
+        </div>
+      </a>
+    </li>`;
+  });
+  return html;
+}
+
+searchBox.addEventListener('keyup', e => {
+  clearSearch.style.display = 'block';
+
+  if (e.keyCode === 13) {
+    loader.style.display = 'flex';
+    newsContainer.style.display = 'none';
+    headlinesFilter.q = e.target.value.trim();
+    articles = [];
+    getArticles(true);
+  }
+});
+
+window.addEventListener('load', function() {
+  loader.className += ' hidden';
+});
+
+clearSearch.addEventListener('click', clear);
+
+more.addEventListener('click', infiniteScroll);
+
+//for scrolling infinitely
+function infiniteScroll() {
+  loader.style.display = 'flex';
+  headlinesFilter.page++;
+  const isSearch = state === 'e' ? true : false;
+  getArticles(isSearch);
+}
+
+switcher.addEventListener('change', e => {
+  const checked = e.target.checked;
+  const theme = checked ? 'dark' : 'light';
+  changeTheme(theme);
+});
+
+//change theme
+function changeTheme(theme) {
+  if (theme === 'dark') {
+    document.body.classList.add('dark-mode');
+    localStorage.setItem('theme', 'dark');
+  } else if (theme === 'light') {
+    document.body.classList.remove('dark-mode');
+    localStorage.setItem('theme', 'light');
+  }
+}
+
+//loading theme
+function themeInit() {
+  if (localStorage.getItem('theme')) {
+    theme = localStorage.getItem('theme');
+  } else {
+    theme = 'light';
+    localStorage.setItem('theme', 'light');
+  }
+  changeTheme(theme);
+  switcher.checked = theme === 'dark' ? true : false;
+}

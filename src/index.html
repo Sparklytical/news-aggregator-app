@@ -1,61 +1,75 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css"
+    />
+    <title>News Aggregator</title>
+  </head>
+  <body>
+    <header>
+      <div class="language-switcher">
+        <label class="label">
+          <div class="toggle">
+            <input
+              class="toggle-state"
+              type="checkbox"
+              name="check"
+              value="check"
+              id="mode-switch"
+            />
+            <div class="toggle-inner">
+              <div class="indicator"></div>
+            </div>
+            <div class="active-bg"></div>
+          </div>
+          <div class="label-text">Dark Mode</div>
+        </label>
+      </div>
+      <div class="container">
+        <div class="navbar-brand brand-logo">
+          <div href="#" class="navbar-item">
+            News Aggregator
+          </div>
+        </div>
+      </div>
+    </header>
 
-<head>
-  <!-- Required meta tags -->
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <main class="container">
+      <section class="section search">
+        <input
+          type="text"
+          id="search"
+          placeholder="Type and press enter to search..."
+        />
 
-  <!-- Bootstrap CSS -->
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
-    integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-  <!-- <link rel="stylesheet" href="./styles/index.css"> -->
+        <button class="clear" id="clear-search">
+          &times;
+        </button>
+      </section>
 
-  <title>News Aggregator</title>
-</head>
+      <section class="section news">
+        <ul id="news-articles" class="articles"></ul>
+        <div class="not-found notification is-info" style="display: none;">
+          No article was found based on the search.
+        </div>
+        <div class="error" style="display: none;">
+          <div class="notification is-danger">
+            Can't fetch Articles. Try Again.
+          </div>
+        </div>
+        <div class="loading" id="loading" style="display: none;">
+          <div class="spinner">
+            <img src="src\styles\loader.gif" alt="Loading" />
+          </div>
+        </div>
+        <button class="button" id="show-more">Show More</button>
+      </section>
+    </main>
 
-<body>
-
-  <div class="container text-center my-5 ">
-    <!-- <span id="apptitle" class="p-2">News Aggregator</span> -->
-    <!-- patch004 -->
-    <span id="apptitle" class="article-author">News Aggregator</span>
-  </div>
-
-  <div class="container">
-    <!-- patch001 -->
-    <input type="text" id="search" class="w-100 p-2" placeholder="Type and press enter to search...">
-
-  </div>
-
-  <div class="container my-2">
-
-    <ul id="news-articles" class="d-flex justify-content-around flex-wrap">
-
-    </ul>
-
-    <!-- patch003 -->
-    <ul id="notfound" class="not-found">
-
-    </ul>
-  </div>
-
-
-
-  <!-- Optional JavaScript -->
-  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-  <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
-    integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
-    integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
-    crossorigin="anonymous"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
-    integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
-    crossorigin="anonymous"></script>
-
-
-  <!-- <script src="./js/index.js"></script> -->
-</body>
-
+    <script src="src\scripts\index.js"></script>
+  </body>
 </html>
